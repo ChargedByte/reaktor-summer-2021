@@ -1,11 +1,7 @@
 <template>
   <v-app-bar app color="primary" dark>
-    <v-tabs>
-      <v-tab
-        v-for="category in categories"
-        :key="category"
-        :to="'/' + category"
-      >
+    <v-tabs v-model="tab">
+      <v-tab v-for="category in categories" :key="categories.indexOf(category)">
         {{ category }}
       </v-tab>
     </v-tabs>
@@ -27,10 +23,19 @@
 </template>
 
 <script lang="ts">
-import { Component, Inject, Vue } from 'nuxt-property-decorator'
+import { Component, Vue, Watch } from 'nuxt-property-decorator'
+
+import { categories } from '~~/categories.json'
 
 @Component
 export default class AppBar extends Vue {
-  @Inject() categories!: Array<string>
+  tab = 0
+
+  categories: Array<string> = categories
+
+  @Watch('tab')
+  onTabChanged() {
+    this.$emit('tabChanged', this.tab)
+  }
 }
 </script>

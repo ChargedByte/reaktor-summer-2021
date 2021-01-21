@@ -1,6 +1,6 @@
 <template>
   <v-app id="wim">
-    <AppBar />
+    <AppBar @tabChanged="updateSelectedTab" />
 
     <v-main>
       <Nuxt />
@@ -16,13 +16,15 @@ import { Component, Provide, Vue } from 'nuxt-property-decorator'
 import AppBar from '~/components/AppBar.vue'
 import AppFooter from '~/components/AppFooter.vue'
 
-import { categories } from '~~/categories.json'
-
 @Component({
   components: { AppBar, AppFooter },
 })
 export default class DefaultLayout extends Vue {
-  @Provide() categories = categories
+  @Provide() selectedTab = 0
+
+  updateSelectedTab(value: number) {
+    this.selectedTab = value
+  }
 }
 </script>
 
