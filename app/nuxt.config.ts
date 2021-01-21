@@ -8,6 +8,9 @@ const config: NuxtConfig = {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
 
+  // Server-side rendering: https://go.nuxtjs.dev/config-ssr
+  ssr: false,
+
   // Modern (https://nuxtjs.org/docs/2.x/configuration-glossary/configuration-modern)
   modern: isDev ? false : 'client',
 
