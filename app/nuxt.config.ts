@@ -16,8 +16,7 @@ const config: NuxtConfig = {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - WiM',
-    title: 'Index',
+    titleTemplate: 'WiM',
     htmlAttrs: {
       lang: 'en',
     },
@@ -32,7 +31,7 @@ const config: NuxtConfig = {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: [{ src: '~/plugins/nuxtClientInit', mode: 'client' }],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
