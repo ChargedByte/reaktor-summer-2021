@@ -1,5 +1,7 @@
 <template>
   <v-app id="wim">
+    <AppBar />
+
     <v-main>
       <Nuxt />
     </v-main>
@@ -7,10 +9,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'nuxt-property-decorator'
+import { Component, Provide, Vue } from 'nuxt-property-decorator'
 
-@Component
-export default class DefaultLayout extends Vue {}
+import AppBar from '~/components/AppBar.vue'
+
+@Component({
+  components: { AppBar },
+})
+export default class DefaultLayout extends Vue {
+  @Provide() categories = ['beanies', 'facemasks', 'gloves']
+}
 </script>
 
 <style lang="scss">
