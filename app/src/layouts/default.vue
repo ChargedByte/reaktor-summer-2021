@@ -16,11 +16,13 @@ import { Component, Provide, Vue } from 'nuxt-property-decorator'
 import AppBar from '~/components/AppBar.vue'
 import AppFooter from '~/components/AppFooter.vue'
 
+import { categories } from '~~/categories.json'
+
 @Component({
   components: { AppBar, AppFooter },
 })
 export default class DefaultLayout extends Vue {
-  @Provide() categories = ['beanies', 'facemasks', 'gloves']
+  @Provide() categories = categories
 }
 </script>
 
