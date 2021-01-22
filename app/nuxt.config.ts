@@ -2,6 +2,16 @@ import { NuxtConfig } from '@nuxt/types'
 
 const isDev = process.env.NODE_ENV === 'development'
 
+const modules = [
+  // https://http.nuxtjs.org/
+  '@nuxt/http',
+]
+
+if (isDev) {
+  // https://github.com/nuxt-community/proxy-module
+  modules.push('@nuxtjs/proxy')
+}
+
 const config: NuxtConfig = {
   srcDir: 'src',
 
@@ -47,10 +57,7 @@ const config: NuxtConfig = {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [
-    // https://http.nuxtjs.org/
-    '@nuxt/http',
-  ],
+  modules,
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
@@ -59,6 +66,16 @@ const config: NuxtConfig = {
 
   // Http module configuration (https://http.nuxtjs.org/options)
   http: {},
+
+  // Proxy module configuration: https://github.com/nuxt-community/proxy-module#options
+  proxy: {
+    '/api': {
+      target: 'http://localhost:4000',
+      pathRewrite: {
+        '^/api': '/api',
+      },
+    },
+  },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
