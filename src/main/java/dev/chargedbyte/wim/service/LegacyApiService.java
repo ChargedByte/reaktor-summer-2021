@@ -1,4 +1,4 @@
-package dev.chargedbyte.wim.handler;
+package dev.chargedbyte.wim.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,21 +14,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-@Component
-public class LegacyApiHandler {
-    private static final Logger log = LoggerFactory.getLogger(LegacyApiHandler.class);
+@Service
+public class LegacyApiService {
+    private static final Logger log = LoggerFactory.getLogger(LegacyApiService.class);
 
     private static final Integer retryCount = 5;
 
     private final HashMap<Category, String> categoryETags;
     private final HashMap<String, String> manufacturerETags;
 
-    public LegacyApiHandler() {
+    public LegacyApiService() {
         this.categoryETags = new HashMap<>();
         this.manufacturerETags = new HashMap<>();
 
@@ -36,7 +38,8 @@ public class LegacyApiHandler {
             .defaultBaseUrl("https://bad-api-assignment.reaktor.com/v2");
     }
 
-    public List<LegacyProduct> getLegacyProductsByCategory(String category) throws LegacyApiException {
+    @Async
+    public CompletableFuture<List<LegacyProduct>> getLegacyProductsByCategory(String category) throws LegacyApiException {
         String eTag = categoryETags.getOrDefault(Category.find(category), "");
 
         for (int i = 0; i < retryCount; i++) {
@@ -54,7 +57,7 @@ public class LegacyApiHandler {
             }
 
             if (response.getStatus() == HttpStatus.NOT_MODIFIED) {
-                return null;
+                return CompletableFuture.completedFuture(null);
             }
 
             if (response.getStatus() == HttpStatus.OK) {
@@ -70,7 +73,7 @@ public class LegacyApiHandler {
                     String header = response.getHeaders().getFirst("Etag");
                     //categoryETags.put(Category.find(category), header);
 
-                    return object;
+                    return CompletableFuture.completedFuture(object);
                 } catch (JsonProcessingException ex) {
                     throw new ParsingException("could not parse response", ex);
                 }
@@ -85,7 +88,8 @@ public class LegacyApiHandler {
         throw new UnknownErrorException("products api request failed after " + retryCount + " retries");
     }
 
-    public List<LegacyAvailability> getLegacyAvailabilitiesByManufacturer(String manufacturer) throws LegacyApiException {
+    @Async
+    public CompletableFuture<List<LegacyAvailability>> getLegacyAvailabilitiesByManufacturer(String manufacturer) throws LegacyApiException {
         String eTag = manufacturerETags.getOrDefault(manufacturer, "");
 
         for (int i = 0; i < retryCount; i++) {
@@ -107,7 +111,7 @@ public class LegacyApiHandler {
             }
 
             if (response.getStatus() == HttpStatus.NOT_MODIFIED) {
-                return null;
+                return CompletableFuture.completedFuture(null);
             }
 
             if (response.getStatus() == HttpStatus.OK) {
@@ -120,7 +124,7 @@ public class LegacyApiHandler {
                     String header = response.getHeaders().getFirst("Etag");
                     //manufacturerETags.put(manufacturer, header);
 
-                    return object.getResponse();
+                    return CompletableFuture.completedFuture(object.getResponse());
                 } catch (JsonProcessingException ex) {
                     throw new ParsingException("could not parse response", ex);
                 }

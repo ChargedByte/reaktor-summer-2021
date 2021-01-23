@@ -1,6 +1,5 @@
 package dev.chargedbyte.wim.service;
 
-import dev.chargedbyte.wim.handler.LegacyApiHandler;
 import dev.chargedbyte.wim.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,10 +9,10 @@ import org.springframework.stereotype.Service;
 public class ProductService {
     private static final Logger log = LoggerFactory.getLogger(ProductService.class);
 
-    private final LegacyApiHandler legacyApiHandler;
+    private final LegacyApiService apiService;
 
-    public ProductService(LegacyApiHandler legacyApiHandler) {
-        this.legacyApiHandler = legacyApiHandler;
+    public ProductService(LegacyApiService apiService) {
+        this.apiService = apiService;
     }
 
     private Availability convertLegacyAvailability(LegacyAvailability legacy) {
