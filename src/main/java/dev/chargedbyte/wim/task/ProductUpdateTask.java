@@ -5,6 +5,7 @@ import dev.chargedbyte.wim.model.LegacyAvailability;
 import dev.chargedbyte.wim.model.LegacyProduct;
 import dev.chargedbyte.wim.model.Product;
 import dev.chargedbyte.wim.repository.ProductRepository;
+import dev.chargedbyte.wim.service.LegacyService;
 import dev.chargedbyte.wim.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,15 +26,13 @@ import java.util.stream.Collectors;
 @Component
 public class ProductUpdateTask implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(ProductUpdateTask.class);
-
-    private AtomicBoolean isRunning = new AtomicBoolean(false);
-
+    private final LegacyService legacyService;
     private final ProductService productService;
-    private final ProductRepository productRepository;
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
-    public ProductUpdateTask(ProductService productService, ProductRepository productRepository) {
+    public ProductUpdateTask(LegacyService legacyService, ProductService productService) {
+        this.legacyService = legacyService;
         this.productService = productService;
-        this.productRepository = productRepository;
     }
 
     public AtomicBoolean getIsRunning() {
@@ -46,7 +45,7 @@ public class ProductUpdateTask implements Runnable {
             if (item == Category.Unknown)
                 continue;
 
-            tasks.add(productService.getLegacyProductsByCategory(item));
+            tasks.add(legacyService.getLegacyProductsByCategory(item));
         }
 
         return tasks.stream()
@@ -67,7 +66,7 @@ public class ProductUpdateTask implements Runnable {
     private List<LegacyAvailability> getLegacyAvailabilities(List<String> manufacturers) {
         List<CompletableFuture<List<LegacyAvailability>>> tasks = new ArrayList<>();
         for (String manufacturer : manufacturers) {
-            tasks.add(productService.getLegacyAvailabilitiesByManufacturer(manufacturer));
+            tasks.add(legacyService.getLegacyAvailabilitiesByManufacturer(manufacturer));
         }
 
         return tasks.stream()
@@ -93,7 +92,7 @@ public class ProductUpdateTask implements Runnable {
                 .findFirst()
                 .orElse(null);
 
-            tasks.add(productService.convertLegacyProduct(lp, la));
+            tasks.add(legacyService.convertLegacyProduct(lp, la));
         }
 
         return tasks.stream()
@@ -137,15 +136,13 @@ public class ProductUpdateTask implements Runnable {
             .collect(Collectors.toList());
 
         for (Category item : categories) {
-            productRepository.deleteByCategory(item);
+            productService.deleteByCategory(item);
         }
 
-        productRepository.saveAll(products);
+        productService.saveAll(products);
 
         Instant end = Instant.now();
-
         log.info("Done with product update in {} seconds", (end.toEpochMilli() - start.toEpochMilli()) / 1000.0);
-
 
         isRunning.set(false);
     }
