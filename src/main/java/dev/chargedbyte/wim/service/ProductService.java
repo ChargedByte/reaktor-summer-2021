@@ -1,5 +1,10 @@
 package dev.chargedbyte.wim.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.chargedbyte.wim.exception.LegacyException;
+import dev.chargedbyte.wim.exception.NotFoundException;
+import dev.chargedbyte.wim.exception.OutOfRetriesException;
 import dev.chargedbyte.wim.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,14 +16,20 @@ import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service for {@link Product}, {@link LegacyProduct} and {@link LegacyAvailability} manipulation
+ */
 @Service
 public class ProductService {
     private static final Logger log = LoggerFactory.getLogger(ProductService.class);
@@ -34,15 +45,13 @@ public class ProductService {
     }
 
     /**
-     * Get an array of products for the specified category
+     * Get a list of products from the legacy api
      *
      * @param category Product category
-     * @return `LegacyProduct[?]` if success or `null` if not modified (304)
-     * @throws IllegalArgumentException On not found (404) or empty body from the legacy API
-     * @throws Exception On no result after max retries
+     * @return On success {@link List} of {@link LegacyProduct} or {@code null} (keep cached), On failure {@link LegacyException}
      */
     @Async
-    public CompletableFuture<LegacyProduct[]> getLegacyProductsByCategory(Category category) throws Exception {
+    public CompletableFuture<List<LegacyProduct>> getLegacyProductsByCategory(Category category) {
         String eTag = categoryETags.getOrDefault(category, "");
 
         RestTemplate restTemplate = new RestTemplateBuilder().build();
@@ -56,48 +65,69 @@ public class ProductService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         for (int i = 0; i < retryCount; i++) {
-            ResponseEntity<LegacyProduct[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, LegacyProduct[].class);
+            try {
+                ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-            if (response.getStatusCode() == HttpStatus.NOT_FOUND || response.getBody() == null) {
-                // If present, clear ETag as the category no longer exists
-                categoryETags.remove(category);
+                if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
+                    return CompletableFuture.completedFuture(null);
+                }
 
-                throw new IllegalArgumentException();
+                if (!response.hasBody()) {
+                    // If present, clear ETag as the category no longer exists
+                    categoryETags.remove(category);
+
+                    log.warn("Products API [{}] responded with no body, assuming {}", category.name().toLowerCase(), HttpStatus.NOT_FOUND);
+                    return CompletableFuture.failedFuture(new NotFoundException());
+                }
+
+                if (response.getStatusCode() == HttpStatus.OK) {
+                    try {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        List<LegacyProduct> list = mapper.readValue(response.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, LegacyProduct.class));
+
+                        String header = response.getHeaders().getETag();
+                        categoryETags.put(category, header != null ? header : "");
+
+                        return CompletableFuture.completedFuture(list);
+                    } catch (JsonProcessingException ex) {
+                        log.warn("Products API [{}] failed response body parsing: {}", category.name().toLowerCase(), ex.getMessage());
+                    }
+                }
+            } catch (RestClientException ex) {
+                if (ex instanceof HttpStatusCodeException) {
+                    log.warn("Products API [{}] responded with status: {}", category.name().toLowerCase(), ((HttpStatusCodeException) ex).getStatusCode());
+
+                    if (((HttpStatusCodeException) ex).getStatusCode() == HttpStatus.NOT_FOUND) {
+                        // If present, clear ETag as the category no longer exists
+                        categoryETags.remove(category);
+
+                        return CompletableFuture.failedFuture(new NotFoundException());
+                    }
+
+                    continue;
+                }
+
+                log.warn("Products API [{}] request errored: {}", category.name().toLowerCase(), ex.getMessage());
             }
-
-            if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
-                return CompletableFuture.completedFuture(null);
-            }
-
-            if (response.getStatusCode() == HttpStatus.OK) {
-                // TODO: Save ETag
-
-                return CompletableFuture.completedFuture(response.getBody());
-            }
-
-            HttpStatus status = response.getStatusCode();
-            log.warn("Products API request failed: {} ({})", status.value(), status.getReasonPhrase());
         }
 
-        log.error("Retry limit reached on products API calls with category: " + category.name());
-        throw new Exception("out of retries");
+        log.warn("Products API [{}] failed after {} retries", category.name().toLowerCase(), retryCount);
+        return CompletableFuture.failedFuture(new OutOfRetriesException());
     }
 
-
     /**
-     * Get an array of availabilities for the specified manufacturer's products
+     * Get a list of availabilities from the legacy api
      *
      * @param manufacturer Product manufacturer
-     * @return `LegacyAvailability[?]` if success or `null` if not modified (304)
-     * @throws IllegalArgumentException On not found (404) or empty body from the legacy API
-     * @throws Exception On no result after max retries
+     * @return On success {@link List} of {@link LegacyAvailability} or {@code null} (keep cached), On failure {@link LegacyException}
      */
     @Async
-    public CompletableFuture<LegacyAvailability[]> getLegacyAvailabilitiesByManufacturer(String manufacturer) throws Exception {
+    public CompletableFuture<List<LegacyAvailability>> getLegacyAvailabilitiesByManufacturer(String manufacturer) {
         String eTag = manufacturerETags.getOrDefault(manufacturer, "");
 
         RestTemplate restTemplate = new RestTemplateBuilder()
-            .setConnectTimeout(Duration.ofSeconds(25))
+            .setConnectTimeout(Duration.ofSeconds(25)) // Account for the slow api
             .build();
 
         String url = "https://bad-api-assignment.reaktor.com/v2/availability/" + manufacturer;
@@ -109,45 +139,69 @@ public class ProductService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         for (int i = 0; i < retryCount; i++) {
-            ResponseEntity<AvailabilityResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity, AvailabilityResponse.class);
+            try {
+                ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-            if (response.getHeaders().containsKey("X-Error-Modes-Active")) {
-                //noinspection ConstantConditions
-                if (!response.getHeaders().getFirst("X-Error-Modes-Active").isBlank()) { // Won't we null, checked above
+                if (response.getHeaders().containsKey("X-Error-Modes-Active")) {
+                    // Won't be null, checked above
+                    if (!Objects.requireNonNull(response.getHeaders().getFirst("X-Error-Modes-Active")).isEmpty()) {
+                        continue;
+                    }
+                }
+
+                if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
+                    return CompletableFuture.completedFuture(null);
+                }
+
+                if (!response.hasBody()) {
+                    // If present, clear ETag as the manufacturer no longer exists
+                    manufacturerETags.remove(manufacturer);
+
+                    log.warn("Availability API [{}] responded with no body, assuming {}", manufacturer, HttpStatus.NOT_FOUND);
+                    return CompletableFuture.failedFuture(new NotFoundException());
+                }
+
+                if (response.getStatusCode() == HttpStatus.OK) {
+                    try {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        AvailabilityResponse object = mapper.readValue(response.getBody(), AvailabilityResponse.class);
+
+                        String header = response.getHeaders().getETag();
+                        manufacturerETags.put(manufacturer, header != null ? header : "");
+
+                        return CompletableFuture.completedFuture(object.getResponse());
+                    } catch (JsonProcessingException ex) {
+                        log.warn("Availability API [{}] failed response body parsing: {}", manufacturer, ex.getMessage());
+                    }
+                }
+            } catch (RestClientException ex) {
+                if (ex instanceof HttpStatusCodeException) {
+                    log.warn("Availability API [{}] responded with status: {}", manufacturer, ((HttpStatusCodeException) ex).getStatusCode());
+
+                    if (((HttpStatusCodeException) ex).getStatusCode() == HttpStatus.NOT_FOUND) {
+                        // If present, clear ETag as the manufacturer no longer exists
+                        manufacturerETags.remove(manufacturer);
+
+                        return CompletableFuture.failedFuture(new NotFoundException());
+                    }
+
                     continue;
                 }
+
+                log.warn("Availability API [{}] request errored: {}", manufacturer, ex.getMessage());
             }
-
-            if (response.getStatusCode() == HttpStatus.NOT_FOUND || response.getBody() == null) {
-                // If present, clear ETag as the category no longer exists
-                manufacturerETags.remove(manufacturer);
-
-                throw new IllegalArgumentException();
-            }
-
-            if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
-                return CompletableFuture.completedFuture(null);
-            }
-
-            if (response.getStatusCode() == HttpStatus.OK) {
-                // TODO: Save ETag
-
-                return CompletableFuture.completedFuture(response.getBody().getResponse());
-            }
-
-            HttpStatus status = response.getStatusCode();
-            log.warn("Availability API request failed: {} ({})", status.value(), status.getReasonPhrase());
         }
 
-        log.error("Retry limit reached on availability API calls with manufacturer: " + manufacturer);
-        throw new Exception("out of retries");
+        log.warn("Availability API [{}] failed after {} retries", manufacturer, retryCount);
+        return CompletableFuture.failedFuture(new OutOfRetriesException());
     }
 
     /**
-     * Extracts an Availability from the payload of a LegacyAvailability
+     * Extracts an {@link Availability} from the payload of a {@link LegacyAvailability}
      *
-     * @param legacy LegacyAvailability
-     * @return Availability
+     * @param legacy {@link LegacyAvailability}
+     * @return An {@link Availability}
      */
     private Availability convertLegacyAvailability(@Nullable LegacyAvailability legacy) {
         if (legacy == null)
@@ -162,17 +216,18 @@ public class ProductService {
     }
 
     /**
-     * Combine a LegacyProduct and a LegacyAvailability to a Product
+     * Combine a {@link LegacyProduct} and a {@link LegacyAvailability} to a {@link Product}
      *
-     * @param lp LegacyProduct
-     * @param la LegacyAvailability
-     * @return Product
+     * @param lp {@link LegacyProduct}
+     * @param la {@link LegacyAvailability}
+     * @return A {@link Product}
      */
-    private Product convertLegacyProduct(LegacyProduct lp, @Nullable LegacyAvailability la) {
+    public CompletableFuture<Product> convertLegacyProduct(LegacyProduct lp, @Nullable LegacyAvailability la) {
         Availability availability = convertLegacyAvailability(la);
         Category category = Category.find(lp.getType());
 
-        return new Product(lp.getId(), category, lp.getName(), Arrays.asList(lp.getColor()), lp.getPrice(), lp.getManufacturer(), availability);
+        Product result = new Product(lp.getId(), category, lp.getName(), lp.getColor(), lp.getPrice(), lp.getManufacturer(), availability);
+        return CompletableFuture.completedFuture(result);
     }
 
     @Data
@@ -180,6 +235,6 @@ public class ProductService {
     @AllArgsConstructor
     static class AvailabilityResponse {
         private Integer code;
-        private LegacyAvailability[] response;
+        private List<LegacyAvailability> response;
     }
 }
