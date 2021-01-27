@@ -39,9 +39,7 @@ public class ProductController {
     @GetMapping("/update")
     public void update(@RequestParam(required = false) boolean force) {
         if (force) {
-            if (!productUpdateTask.getIsRunning().get()) {
-                taskScheduler.schedule(productUpdateTask, new Date());
-            }
+            taskScheduler.schedule(productUpdateTask, new Date());
         }
     }
 }

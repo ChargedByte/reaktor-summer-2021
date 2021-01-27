@@ -29,6 +29,7 @@ public class ProductUpdateTask implements Runnable {
     private final LegacyService legacyService;
     private final ProductService productService;
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
+    private final AtomicBoolean isFirstRun = new AtomicBoolean(true);
 
     public ProductUpdateTask(LegacyService legacyService, ProductService productService) {
         this.legacyService = legacyService;
@@ -37,6 +38,10 @@ public class ProductUpdateTask implements Runnable {
 
     public AtomicBoolean getIsRunning() {
         return isRunning;
+    }
+
+    public AtomicBoolean getIsFirstRun() {
+        return isFirstRun;
     }
 
     private List<LegacyProduct> getLegacyProducts() {
@@ -143,6 +148,9 @@ public class ProductUpdateTask implements Runnable {
 
         Instant end = Instant.now();
         log.info("Done with product update in {} seconds", (end.toEpochMilli() - start.toEpochMilli()) / 1000.0);
+
+        if (isFirstRun.get())
+            isFirstRun.set(false);
 
         isRunning.set(false);
     }
