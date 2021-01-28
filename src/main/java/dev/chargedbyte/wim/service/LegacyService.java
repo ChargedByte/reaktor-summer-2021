@@ -45,7 +45,7 @@ public class LegacyService {
     }
 
     /**
-     * Get a list of products from the legacy api
+     * Get a list of products from the legacy API
      *
      * @param category Product category
      * @return On success {@link List} of {@link LegacyProduct} or {@code null} (keep cached), On failure {@link LegacyException}
@@ -84,12 +84,12 @@ public class LegacyService {
                     try {
                         ObjectMapper mapper = new ObjectMapper();
 
-                        List<LegacyProduct> list = mapper.readValue(response.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, LegacyProduct.class));
+                        List<LegacyProduct> out = mapper.readValue(response.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, LegacyProduct.class));
 
                         String header = response.getHeaders().getETag();
                         categoryETags.put(category, header != null ? header : "");
 
-                        return CompletableFuture.completedFuture(list);
+                        return CompletableFuture.completedFuture(out);
                     } catch (JsonProcessingException ex) {
                         log.warn("Products API [{}] failed response body parsing: {}", category.name().toLowerCase(), ex.getMessage());
                     }
@@ -117,7 +117,7 @@ public class LegacyService {
     }
 
     /**
-     * Get a list of availabilities from the legacy api
+     * Get a list of availabilities from the legacy API
      *
      * @param manufacturer Product manufacturer
      * @return On success {@link List} of {@link LegacyAvailability} or {@code null} (keep cached), On failure {@link LegacyException}
@@ -127,7 +127,7 @@ public class LegacyService {
         String eTag = manufacturerETags.getOrDefault(manufacturer, "");
 
         RestTemplate restTemplate = new RestTemplateBuilder()
-            .setConnectTimeout(Duration.ofSeconds(25)) // Account for the slow api
+            .setConnectTimeout(Duration.ofSeconds(25)) // Account for the slow API
             .build();
 
         String url = "https://bad-api-assignment.reaktor.com/v2/availability/" + manufacturer;
@@ -203,7 +203,7 @@ public class LegacyService {
      * @param legacy {@link LegacyAvailability}
      * @return An {@link Availability}
      */
-    private Availability convertLegacyAvailability(@Nullable LegacyAvailability legacy) {
+    public Availability convertLegacyAvailability(@Nullable LegacyAvailability legacy) {
         if (legacy == null)
             return Availability.Unknown;
 
@@ -222,12 +222,15 @@ public class LegacyService {
      * @param la {@link LegacyAvailability}
      * @return A {@link Product}
      */
+    @Async
     public CompletableFuture<Product> convertLegacyProduct(LegacyProduct lp, @Nullable LegacyAvailability la) {
-        Availability availability = convertLegacyAvailability(la);
+        Availability availability = Availability.Unknown;
+        if (la != null) {
+            availability = convertLegacyAvailability(la);
+        }
         Category category = Category.find(lp.getType());
 
-        Product result = new Product(lp.getId(), category, lp.getName(), lp.getColor(), lp.getPrice(), lp.getManufacturer(), availability);
-        return CompletableFuture.completedFuture(result);
+        return CompletableFuture.completedFuture(new Product(lp.getId(), category, lp.getName(), lp.getColor(), lp.getPrice(), lp.getManufacturer(), availability));
     }
 
     @Data
