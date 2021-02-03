@@ -2,6 +2,8 @@ package dev.chargedbyte.wim.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import dev.chargedbyte.wim.model.ErrorState;
+import dev.chargedbyte.wim.service.ProductService;
 import dev.chargedbyte.wim.task.ProductUpdateTask;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,9 +20,17 @@ public class ApiController {
 
     private final ProductUpdateTask productUpdateTask;
 
-    public ApiController(TaskScheduler taskScheduler, ProductUpdateTask productUpdateTask) {
+    private final ProductService productService;
+
+    public ApiController(TaskScheduler taskScheduler, ProductUpdateTask productUpdateTask, ProductService productService) {
         this.taskScheduler = taskScheduler;
         this.productUpdateTask = productUpdateTask;
+        this.productService = productService;
+    }
+
+    @GetMapping("/errors")
+    public ErrorState errors() {
+        return productService.getErrorState();
     }
 
     @GetMapping("/status")

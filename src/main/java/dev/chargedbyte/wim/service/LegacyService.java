@@ -23,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -77,7 +76,7 @@ public class LegacyService {
                     categoryETags.remove(category);
 
                     log.warn("Products API [{}] responded with no body, assuming {}", category.name().toLowerCase(), HttpStatus.NOT_FOUND);
-                    return CompletableFuture.failedFuture(new NotFoundException());
+                    return CompletableFuture.failedFuture(new NotFoundException(category));
                 }
 
                 if (response.getStatusCode() == HttpStatus.OK) {
@@ -102,7 +101,7 @@ public class LegacyService {
                         // If present, clear ETag as the category no longer exists
                         categoryETags.remove(category);
 
-                        return CompletableFuture.failedFuture(new NotFoundException());
+                        return CompletableFuture.failedFuture(new NotFoundException(category));
                     }
 
                     continue;
@@ -113,7 +112,7 @@ public class LegacyService {
         }
 
         log.warn("Products API [{}] failed after {} retries", category.name().toLowerCase(), retryCount);
-        return CompletableFuture.failedFuture(new OutOfRetriesException());
+        return CompletableFuture.failedFuture(new OutOfRetriesException(category));
     }
 
     /**
@@ -142,11 +141,10 @@ public class LegacyService {
             try {
                 ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-                if (response.getHeaders().containsKey("X-Error-Modes-Active")) {
-                    // Won't be null, checked above
-                    if (!Objects.requireNonNull(response.getHeaders().getFirst("X-Error-Modes-Active")).isEmpty()) {
-                        continue;
-                    }
+                String errorMode = response.getHeaders().getFirst("X-Error-Modes-Active");
+                if (errorMode != null && !errorMode.isEmpty()) {
+                    log.warn("Availability API [{}] responded with a populated error header", manufacturer);
+                    continue;
                 }
 
                 if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
@@ -158,7 +156,7 @@ public class LegacyService {
                     manufacturerETags.remove(manufacturer);
 
                     log.warn("Availability API [{}] responded with no body, assuming {}", manufacturer, HttpStatus.NOT_FOUND);
-                    return CompletableFuture.failedFuture(new NotFoundException());
+                    return CompletableFuture.failedFuture(new NotFoundException(manufacturer));
                 }
 
                 if (response.getStatusCode() == HttpStatus.OK) {
@@ -183,7 +181,7 @@ public class LegacyService {
                         // If present, clear ETag as the manufacturer no longer exists
                         manufacturerETags.remove(manufacturer);
 
-                        return CompletableFuture.failedFuture(new NotFoundException());
+                        return CompletableFuture.failedFuture(new NotFoundException(manufacturer));
                     }
 
                     continue;
@@ -194,7 +192,7 @@ public class LegacyService {
         }
 
         log.warn("Availability API [{}] failed after {} retries", manufacturer, retryCount);
-        return CompletableFuture.failedFuture(new OutOfRetriesException());
+        return CompletableFuture.failedFuture(new OutOfRetriesException(manufacturer));
     }
 
     /**

@@ -1,5 +1,6 @@
 package dev.chargedbyte.wim.task;
 
+import dev.chargedbyte.wim.exception.LegacyException;
 import dev.chargedbyte.wim.model.*;
 import dev.chargedbyte.wim.repository.ProductRepository;
 import dev.chargedbyte.wim.service.LegacyService;
@@ -25,6 +26,8 @@ public class ProductUpdateTask implements Runnable {
     private final ProductService productService;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final AtomicBoolean firstRun = new AtomicBoolean(true);
+
+    private ErrorState errorState;
 
     public ProductUpdateTask(LegacyService legacyService, ProductService productService) {
         this.legacyService = legacyService;
@@ -52,9 +55,13 @@ public class ProductUpdateTask implements Runnable {
             .map(x -> {
                 try {
                     return x.get();
-                } catch (InterruptedException | ExecutionException ex) {
-                    // TODO: Handle
-                    ex.printStackTrace();
+                } catch (ExecutionException ex) {
+                    if (ex.getCause() instanceof LegacyException) {
+                        Category category = Category.find(ex.getCause().getMessage());
+                        errorState.addFailedCategory(category);
+                    }
+                } catch (InterruptedException ex) {
+                    errorState.getProductsTasksInterrupted().compareAndExchange(false, true);
                 }
                 return null;
             })
@@ -73,9 +80,14 @@ public class ProductUpdateTask implements Runnable {
             .map(x -> {
                 try {
                     return x.get();
-                } catch (InterruptedException | ExecutionException ex) {
-                    // TODO: Handle
-                    ex.printStackTrace();
+                } catch (ExecutionException ex) {
+                    if (ex.getCause() instanceof LegacyException) {
+                        String manufacturer = ex.getCause().getMessage();
+                        errorState.addFailedManufacturer(manufacturer);
+                    }
+
+                } catch (InterruptedException ex) {
+                    errorState.getAvailabilityTasksInterrupted().compareAndExchange(false, true);
                 }
                 return null;
             })
@@ -105,8 +117,8 @@ public class ProductUpdateTask implements Runnable {
                 try {
                     return x.get();
                 } catch (InterruptedException | ExecutionException ex) {
-                    // TODO: Handle
-                    ex.printStackTrace();
+                    // From what I can tell this shouldn't be able to fail other than being interrupted
+                    errorState.getProductConversionTasksFailed().compareAndSet(false, true);
                 }
                 return null;
             })
@@ -115,6 +127,8 @@ public class ProductUpdateTask implements Runnable {
     }
 
     private void work() {
+        errorState = new ErrorState();
+
         List<LegacyProduct> legacyProducts = getProducts();
 
         List<String> manufacturers = legacyProducts.stream()
@@ -194,6 +208,8 @@ public class ProductUpdateTask implements Runnable {
                 }
             }
         }
+
+        productService.setErrorState(errorState);
     }
 
     @Override

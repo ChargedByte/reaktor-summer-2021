@@ -1,5 +1,7 @@
 package dev.chargedbyte.wim.exception;
 
+import dev.chargedbyte.wim.model.Category;
+
 /**
  * Exception thrown to indicate a problem with the legacy api
  */
@@ -7,15 +9,11 @@ public class LegacyException extends Exception {
     public LegacyException() {
     }
 
-    public LegacyException(String message) {
-        super(message);
+    public LegacyException(Category category) {
+        super(category.name());
     }
 
-    public LegacyException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public LegacyException(Throwable cause) {
-        super(cause);
+    public LegacyException(String manufacturer) {
+        super(manufacturer);
     }
 }
