@@ -1,14 +1,6 @@
 <template>
   <v-container>
-    <v-row align="center" justify="center">
-      <v-overlay :value="loading" opacity="0">
-        <v-progress-circular
-          color="primary lighten-1"
-          indeterminate
-          size="96"
-        />
-      </v-overlay>
-    </v-row>
+    <LoadingOverlay :value="!ready" />
   </v-container>
 </template>
 
@@ -17,20 +9,29 @@ import { Context } from '@nuxt/types'
 
 import { Component, Vue } from 'nuxt-property-decorator'
 
+import LoadingOverlay from '~/components/LoadingOverlay.vue'
+
+import { generalStore } from '~/store'
+
 import { categories } from '~~/categories.json'
 
+interface StatusObject {
+  status: string
+}
+
 @Component({
+  components: { LoadingOverlay },
   layout: 'empty',
 })
 export default class IndexPage extends Vue {
   timer: NodeJS.Timeout | undefined
 
-  refresh() {
-    this.$nuxt.refresh()
+  get ready() {
+    return generalStore.loadingComplete
   }
 
   updated() {
-    if (!this.$data.loading) {
+    if (this.ready) {
       if (typeof this.timer !== 'undefined') {
         clearInterval(this.timer)
       }
@@ -40,20 +41,22 @@ export default class IndexPage extends Vue {
   }
 
   created() {
-    if (this.$data.loading) {
-      this.timer = setInterval(this.refresh, 1000)
+    if (!this.ready && typeof this.timer === 'undefined') {
+      this.timer = setInterval(this.$nuxt.refresh, 1000)
     }
 
-    if (!this.$data.loading) {
+    if (this.ready) {
       this.$router.push({ path: '/' + categories[0] })
     }
   }
 
   async asyncData(ctx: Context) {
-    const response: string = await ctx.$http.$get('/api/is-loading')
-    const loading: boolean = JSON.parse(response)
+    if (!generalStore.loadingComplete) {
+      const object: StatusObject = await ctx.$http.$get('/api/status')
 
-    return { loading }
+      const ready = object.status === 'ready'
+      if (ready) generalStore.toggleLoadingComplete()
+    }
   }
 }
 </script>

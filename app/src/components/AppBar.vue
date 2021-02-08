@@ -1,6 +1,6 @@
 <template>
-  <v-app-bar app color="primary" dark>
-    <v-tabs>
+  <v-app-bar app color="primary" dark dense>
+    <v-tabs centered>
       <v-tab
         v-for="category in categories"
         :key="categories.indexOf(category)"
@@ -9,12 +9,6 @@
         {{ category }}
       </v-tab>
     </v-tabs>
-
-    <v-spacer />
-
-    <v-btn disabled icon>
-      <v-icon>mdi-cog</v-icon>
-    </v-btn>
   </v-app-bar>
 </template>
 

@@ -2,7 +2,7 @@
   <v-footer app>
     <v-spacer />
 
-    <v-btn href="https://github.com/ChargedByte/WiM" icon target="_blank">
+    <v-btn href="https://github.com/ChargedByte/WiM" icon small target="_blank">
       <v-icon>mdi-github</v-icon>
     </v-btn>
   </v-footer>

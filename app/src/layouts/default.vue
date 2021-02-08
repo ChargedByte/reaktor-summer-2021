@@ -21,9 +21,3 @@ import AppFooter from '~/components/AppFooter.vue'
 })
 export default class DefaultLayout extends Vue {}
 </script>
-
-<style lang="scss">
-html {
-  overflow-y: auto;
-}
-</style>

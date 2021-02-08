@@ -2,16 +2,6 @@ import { NuxtConfig } from '@nuxt/types'
 
 const isDev = process.env.NODE_ENV === 'development'
 
-const modules = [
-  // https://http.nuxtjs.org/
-  '@nuxt/http',
-]
-
-if (isDev) {
-  // https://github.com/nuxt-community/proxy-module
-  modules.push('@nuxtjs/proxy')
-}
-
 const config: NuxtConfig = {
   srcDir: 'src',
 
@@ -26,7 +16,8 @@ const config: NuxtConfig = {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: 'WiM',
+    titleTemplate: '%s | WiM',
+    title: 'Loading',
     htmlAttrs: {
       lang: 'en',
     },
@@ -41,7 +32,7 @@ const config: NuxtConfig = {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [{ src: '~/plugins/nuxtClientInit', mode: 'client' }],
+  plugins: [{ src: '~/plugins/httpAccessor' }],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -57,7 +48,10 @@ const config: NuxtConfig = {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules,
+  modules: [
+    // https://http.nuxtjs.org/
+    '@nuxt/http',
+  ],
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
@@ -65,16 +59,13 @@ const config: NuxtConfig = {
   },
 
   // Http module configuration (https://http.nuxtjs.org/options)
-  http: {},
+  http: {
+    proxy: isDev,
+  },
 
   // Proxy module configuration: https://github.com/nuxt-community/proxy-module#options
   proxy: {
-    '/api': {
-      target: 'http://localhost:4000',
-      pathRewrite: {
-        '^/api': '/api',
-      },
-    },
+    '/api': 'http://localhost:4000',
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

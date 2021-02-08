@@ -12,9 +12,3 @@ import { Component, Vue } from 'nuxt-property-decorator'
 @Component
 export default class EmptyLayout extends Vue {}
 </script>
-
-<style lang="scss">
-html {
-  overflow-y: auto;
-}
-</style>

@@ -7,8 +7,8 @@ import dev.chargedbyte.wim.service.ProductService;
 import dev.chargedbyte.wim.task.ProductUpdateTask;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
@@ -47,14 +47,16 @@ public class ApiController {
         return node;
     }
 
-    @GetMapping("/update")
-    public ObjectNode update(@RequestParam(required = false) boolean force) {
+    @PostMapping("/reload")
+    public ObjectNode reload() {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
-        if (force) {
+        if (!productUpdateTask.isRunning().get()) {
             taskScheduler.schedule(productUpdateTask, Instant.now());
-            node.put("status", "ok");
+            node.put("status", "started");
+        } else {
+            node.put("status", "running");
         }
 
         return node;

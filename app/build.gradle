@@ -2,7 +2,10 @@ plugins {
     id('com.github.node-gradle.node') version('3.0.0-rc7')
 }
 
-tasks.register('clean') {
+node {
+}
+
+task clean(type: Delete) {
     delete("${projectDir}/.nuxt")
     delete("${projectDir}/dist")
 }
