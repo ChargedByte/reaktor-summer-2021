@@ -2,6 +2,8 @@ import Product from '~/model/product'
 
 export default class CacheObject {
   private readonly _category: string
+  private readonly _lastModified: Date
+  private readonly _products: Array<Product>
 
   constructor(category: string, lastModified: Date, products: Array<Product>) {
     this._category = category
@@ -9,24 +11,12 @@ export default class CacheObject {
     this._products = products
   }
 
-  private _lastModified: Date
-
   get lastModified(): Date {
     return this._lastModified
   }
 
-  set lastModified(value: Date) {
-    this._lastModified = value
-  }
-
-  private _products: Array<Product>
-
   get products(): Array<Product> {
     return this._products
-  }
-
-  set products(value: Array<Product>) {
-    this._products = value
   }
 
   get category(): string {
