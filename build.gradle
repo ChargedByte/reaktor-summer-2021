@@ -1,6 +1,7 @@
 plugins {
     id('org.springframework.boot') version('2.4.2')
     id('io.spring.dependency-management') version('1.0.11.RELEASE')
+    id('org.barfuin.gradle.taskinfo') version('1.0.5')
     id('java')
 }
 
@@ -8,8 +9,8 @@ group('dev.chargedbyte')
 version('0.0.1')
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility(JavaVersion.VERSION_11)
+    targetCompatibility(JavaVersion.VERSION_11)
 }
 
 configurations {
@@ -24,24 +25,33 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation('com.google.code.findbugs:jsr305:3.0.2')
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.data:spring-data-keyvalue')
 
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly('org.projectlombok:lombok')
 
-    implementation 'org.springframework.data:spring-data-keyvalue'
+    developmentOnly('org.springframework.boot:spring-boot-devtools')
 
-    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor('org.projectlombok:lombok')
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
-    annotationProcessor 'org.projectlombok:lombok'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 
 test {
     useJUnitPlatform()
 }
+
+task copyAppToBuildResources(type: Copy) {
+    dependsOn(':app:build')
+
+    from(project(':app').buildDir)
+    into("${buildDir}/resources/main/static/app")
+
+    include('**/*')
+}
+
+bootJar.dependsOn(copyAppToBuildResources)
 
 wrapper {
     gradleVersion('6.8.2')

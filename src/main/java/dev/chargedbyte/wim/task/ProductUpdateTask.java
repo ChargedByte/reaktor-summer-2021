@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @Component
 public class ProductUpdateTask implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(ProductUpdateTask.class);
+
     private final LegacyService legacyService;
     private final ProductService productService;
     private final AtomicBoolean running = new AtomicBoolean(false);

@@ -4,6 +4,8 @@ import dev.chargedbyte.wim.model.Category;
 import dev.chargedbyte.wim.model.Product;
 import dev.chargedbyte.wim.model.ProductStorage;
 import dev.chargedbyte.wim.service.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/products")
 public class ProductsController {
+    private final Logger log = LoggerFactory.getLogger(ProductsController.class);
+
     private final ProductService productService;
 
     public ProductsController(ProductService productService) {

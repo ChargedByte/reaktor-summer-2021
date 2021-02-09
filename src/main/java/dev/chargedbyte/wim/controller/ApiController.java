@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import dev.chargedbyte.wim.model.ErrorState;
 import dev.chargedbyte.wim.service.ProductService;
 import dev.chargedbyte.wim.task.ProductUpdateTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +18,8 @@ import java.time.Instant;
 @RestController
 @RequestMapping("/api")
 public class ApiController {
+    private final Logger log = LoggerFactory.getLogger(ApiController.class);
+
     private final TaskScheduler taskScheduler;
 
     private final ProductUpdateTask productUpdateTask;
