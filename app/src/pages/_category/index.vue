@@ -48,19 +48,22 @@ import { categories } from '~~/categories.json'
 export default class CategoryPage extends Vue {
   timer: NodeJS.Timeout | undefined
 
-  beforeRouteEnter(_to: Route, _from: Route, next: Function) {
-    // if the app hasn't been loaded, go make sure it's ready to be used
-    if (!generalStore.loadingComplete) {
-      next({ path: '/' })
+  beforeRouteEnter(to: Route, _from: Route, next: Function) {
+    const category = to.params.category
+
+    // only accept valid categories
+    if (categories.includes(category)) {
+      // if the app hasn't been loaded, go make sure it's ready to be used
+      if (!generalStore.loadingComplete) {
+        next({ path: '/' })
+        return
+      }
+
+      next()
       return
     }
-    next()
-  }
 
-  // only accept valid categories
-  validate(ctx: Context) {
-    const category = ctx.route.params.category
-    return categories.includes(category)
+    next(new Error('404:NOT_FOUND'))
   }
 
   created() {
