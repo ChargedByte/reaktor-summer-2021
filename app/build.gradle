@@ -13,8 +13,12 @@ task clean(type: Delete) {
     delete("${projectDir}/dist") // generate
 }
 
+task install(type: YarnTask) {
+    args = ['install']
+}
+
 task generate(type: YarnTask) {
-    dependsOn(yarn_install)
+    dependsOn(install)
 
     args = ['generate', '--fail-on-error']
 }
