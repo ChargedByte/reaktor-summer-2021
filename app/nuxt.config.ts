@@ -8,13 +8,16 @@ const config: NuxtConfig = {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
 
+  // Server-side rendering: https://go.nuxtjs.dev/config-ssr
+  ssr: false,
+
   // Modern (https://nuxtjs.org/docs/2.x/configuration-glossary/configuration-modern)
   modern: isDev ? false : 'client',
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - WiM',
-    title: 'Index',
+    titleTemplate: '%s | WiM',
+    title: 'Loading',
     htmlAttrs: {
       lang: 'en',
     },
@@ -56,7 +59,14 @@ const config: NuxtConfig = {
   },
 
   // Http module configuration (https://http.nuxtjs.org/options)
-  http: {},
+  http: {
+    proxy: isDev,
+  },
+
+  // Proxy module configuration: https://github.com/nuxt-community/proxy-module#options
+  proxy: {
+    '/api': 'http://localhost:4000',
+  },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},

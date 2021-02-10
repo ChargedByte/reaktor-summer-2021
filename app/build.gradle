@@ -1,3 +1,27 @@
 plugins {
-    id('com.github.node-gradle.node') version('3.0.0-rc7')
+    id('com.github.node-gradle.node') version('3.0.0')
+}
+
+task clean(type: Delete) {
+    delete(buildDir)
+
+    delete("${projectDir}/.nuxt") // dev
+    delete("${projectDir}/dist") // generate
+}
+
+task generate(type: YarnTask) {
+    args = ['generate', '--fail-on-error']
+}
+
+task copyToBuildDir(type: Copy) {
+    dependsOn(generate)
+
+    from('dist')
+    into(buildDir)
+
+    include('**/*')
+}
+
+task build() {
+    dependsOn(copyToBuildDir)
 }
