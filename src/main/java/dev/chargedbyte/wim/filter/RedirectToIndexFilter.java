@@ -19,7 +19,7 @@ public class RedirectToIndexFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         String requestURI = req.getRequestURI();
 
-        if (requestURI.startsWith("/api") || requestURI.startsWith("/app")) {
+        if (requestURI.startsWith("/api") || requestURI.startsWith("/_nuxt") || requestURI.startsWith("/200.html")) {
             chain.doFilter(request, response);
             return;
         }

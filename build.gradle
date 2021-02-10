@@ -46,7 +46,7 @@ task copyAppToBuildResources(type: Copy) {
     dependsOn(':app:build')
 
     from(project(':app').buildDir)
-    into("${buildDir}/resources/main/static/app")
+    into("${buildDir}/resources/main/static")
 
     include('**/*')
 }

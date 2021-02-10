@@ -14,6 +14,6 @@ public class AppController {
     @GetMapping({"/", ""})
     public String index() {
         //noinspection SpringMVCViewInspection
-        return "/app/index.html";
+        return "/index.html";
     }
 }
