@@ -12,7 +12,7 @@ const config: NuxtConfig = {
   ssr: false,
 
   // Modern (https://nuxtjs.org/docs/2.x/configuration-glossary/configuration-modern)
-  modern: isDev ? false : 'client',
+  // modern: isDev ? false : 'client',
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
