@@ -6,11 +6,11 @@ plugins {
 }
 
 group('dev.chargedbyte')
-version('0.0.1')
+version('1.0.0')
 
 java {
-    sourceCompatibility(JavaVersion.VERSION_11)
-    targetCompatibility(JavaVersion.VERSION_11)
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 configurations {
@@ -52,6 +52,9 @@ task copyAppToBuildResources(type: Copy) {
 }
 
 bootJar.dependsOn(copyAppToBuildResources)
+
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter(clean)
 
 wrapper {
     gradleVersion('6.8.2')
