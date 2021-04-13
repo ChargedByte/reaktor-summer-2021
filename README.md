@@ -2,7 +2,7 @@
 
 My solution to Reaktor's Junior Developer, summer 2021 [pre-assignment](https://web.archive.org/web/20201231124339/https://www.reaktor.com/junior-dev-assignment/)
 
-Live Demo: ~~https://cryptic-hamlet-57307.herokuapp.com/~~  
+Live Demo: ~~https://cryptic-hamlet-57307.herokuapp.com/~~ No longer available  
 Initial startup of the application can take a couple of minutes as it initially pulls data from the legacy APIs to the cache.
 
 WiM consists of two distinct parts, server and app.
