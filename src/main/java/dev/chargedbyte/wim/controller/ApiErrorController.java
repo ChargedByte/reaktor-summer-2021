@@ -21,9 +21,4 @@ public class ApiErrorController implements ErrorController {
 
         return "Unknown Error Occurred";
     }
-
-    @Override
-    public String getErrorPath() {
-        return null;
-    }
 }
