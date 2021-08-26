@@ -23,6 +23,9 @@
 import { Context } from '@nuxt/types'
 
 import { Component, Vue } from 'nuxt-property-decorator'
+
+// Really don't know what this error is on about, this is definitely present
+// eslint-disable-next-line import/named
 import { Route } from 'vue-router'
 
 import DataAlert from '~/components/DataAlert.vue'
