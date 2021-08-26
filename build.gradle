@@ -21,7 +21,6 @@ configurations {
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
@@ -55,7 +54,3 @@ bootJar.dependsOn(copyAppToBuildResources)
 
 task stage(dependsOn: ['build', 'clean'])
 build.mustRunAfter(clean)
-
-wrapper {
-    gradleVersion('6.8.2')
-}
