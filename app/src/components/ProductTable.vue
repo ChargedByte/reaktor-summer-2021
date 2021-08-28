@@ -19,7 +19,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
-import AvailabilityChip from '~/components/AvailabilityItem.vue'
+import AvailabilityChip from '~/components/AvailabilityChip.vue'
 import ColorsItem from '~/components/ColorsItem.vue'
 
 import Product from '~/model/product'
