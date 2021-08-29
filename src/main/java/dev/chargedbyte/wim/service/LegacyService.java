@@ -6,12 +6,8 @@ import dev.chargedbyte.wim.exception.LegacyException;
 import dev.chargedbyte.wim.exception.NotFoundException;
 import dev.chargedbyte.wim.exception.OutOfRetriesException;
 import dev.chargedbyte.wim.model.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Async;
@@ -20,7 +16,6 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -38,9 +33,13 @@ public class LegacyService {
     private final ConcurrentHashMap<Category, String> categoryETags;
     private final ConcurrentHashMap<String, String> manufacturerETags;
 
-    public LegacyService() {
+    private final RestTemplate restTemplate;
+
+    public LegacyService(RestTemplate restTemplate) {
         this.categoryETags = new ConcurrentHashMap<>();
         this.manufacturerETags = new ConcurrentHashMap<>();
+
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -52,8 +51,6 @@ public class LegacyService {
     @Async
     public CompletableFuture<List<LegacyProduct>> getLegacyProductsByCategory(Category category) {
         String eTag = categoryETags.getOrDefault(category, "");
-
-        RestTemplate restTemplate = new RestTemplateBuilder().build();
 
         String url = "https://bad-api-assignment.reaktor.com/v2/products/" + category.name().toLowerCase();
 
@@ -124,10 +121,6 @@ public class LegacyService {
     @Async
     public CompletableFuture<List<LegacyAvailability>> getLegacyAvailabilitiesByManufacturer(String manufacturer) {
         String eTag = manufacturerETags.getOrDefault(manufacturer, "");
-
-        RestTemplate restTemplate = new RestTemplateBuilder()
-            .setConnectTimeout(Duration.ofSeconds(25)) // Account for the slow API
-            .build();
 
         String url = "https://bad-api-assignment.reaktor.com/v2/availability/" + manufacturer;
 
@@ -229,13 +222,5 @@ public class LegacyService {
         Category category = Category.find(lp.getType());
 
         return CompletableFuture.completedFuture(new Product(lp.getId(), category, lp.getName(), lp.getColor(), lp.getPrice(), lp.getManufacturer(), availability));
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    static class AvailabilityResponse {
-        private Integer code;
-        private List<LegacyAvailability> response;
     }
 }
