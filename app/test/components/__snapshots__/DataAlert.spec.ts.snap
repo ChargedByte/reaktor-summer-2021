@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DataAlert renders correctly: error + reload 1`] = `
+"<div role=\\"alert\\" class=\\"v-alert v-sheet theme--dark v-alert--border v-alert--dense v-alert--prominent v-alert--border-left error\\">
+  <div class=\\"v-alert__wrapper\\"><i aria-hidden=\\"true\\" class=\\"v-icon notranslate v-alert__icon mdi mdi-alert theme--dark\\"></i>
+    <div class=\\"v-alert__content\\">
+      <div class=\\"row align-center\\">
+        <div class=\\"grow col\\">
+          Test with error type
+        </div>
+        <div class=\\"shrink col\\"><button type=\\"button\\" class=\\"v-btn v-btn--text theme--dark v-size--default\\"><span class=\\"v-btn__content\\">Reload</span></button></div>
+      </div>
+    </div>
+    <div class=\\"v-alert__border v-alert__border--left\\"></div>
+  </div>
+</div>"
+`;
+
+exports[`DataAlert renders correctly: error 1`] = `
+"<div role=\\"alert\\" class=\\"v-alert v-sheet theme--dark v-alert--border v-alert--dense v-alert--border-left error\\">
+  <div class=\\"v-alert__wrapper\\"><i aria-hidden=\\"true\\" class=\\"v-icon notranslate v-alert__icon mdi mdi-alert theme--dark\\"></i>
+    <div class=\\"v-alert__content\\">
+      Test with error type
+    </div>
+    <div class=\\"v-alert__border v-alert__border--left\\"></div>
+  </div>
+</div>"
+`;
+
+exports[`DataAlert renders correctly: warning + reload 1`] = `
+"<div role=\\"alert\\" class=\\"v-alert v-sheet theme--dark v-alert--border v-alert--dense v-alert--prominent v-alert--border-left warning\\">
+  <div class=\\"v-alert__wrapper\\"><i aria-hidden=\\"true\\" class=\\"v-icon notranslate v-alert__icon mdi mdi-exclamation theme--dark\\"></i>
+    <div class=\\"v-alert__content\\">
+      <div class=\\"row align-center\\">
+        <div class=\\"grow col\\">
+          Test with warning type
+        </div>
+        <div class=\\"shrink col\\"><button type=\\"button\\" class=\\"v-btn v-btn--text theme--dark v-size--default\\"><span class=\\"v-btn__content\\">Reload</span></button></div>
+      </div>
+    </div>
+    <div class=\\"v-alert__border v-alert__border--left\\"></div>
+  </div>
+</div>"
+`;
+
+exports[`DataAlert renders correctly: warning 1`] = `
+"<div role=\\"alert\\" class=\\"v-alert v-sheet theme--dark v-alert--border v-alert--dense v-alert--border-left warning\\">
+  <div class=\\"v-alert__wrapper\\"><i aria-hidden=\\"true\\" class=\\"v-icon notranslate v-alert__icon mdi mdi-exclamation theme--dark\\"></i>
+    <div class=\\"v-alert__content\\">
+      Test with warning type
+    </div>
+    <div class=\\"v-alert__border v-alert__border--left\\"></div>
+  </div>
+</div>"
+`;

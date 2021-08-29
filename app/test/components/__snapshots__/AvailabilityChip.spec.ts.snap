@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AvailabilityChip renders correctly: InStock 1`] = `"<span class=\\"v-chip theme--light v-size--small success\\"><span class=\\"v-chip__content\\">In Stock</span></span>"`;
+
+exports[`AvailabilityChip renders correctly: LessThan10 1`] = `"<span class=\\"v-chip theme--light v-size--small warning\\"><span class=\\"v-chip__content\\">Less than 10</span></span>"`;
+
+exports[`AvailabilityChip renders correctly: OutOfStock 1`] = `"<span class=\\"v-chip theme--light v-size--small error\\"><span class=\\"v-chip__content\\">Out of Stock</span></span>"`;
+
+exports[`AvailabilityChip renders correctly: empty 1`] = `"<span class=\\"v-chip theme--light v-size--small grey\\"><span class=\\"v-chip__content\\">Unknown</span></span>"`;

@@ -1,6 +1,7 @@
 import { NuxtConfig } from '@nuxt/types'
 
 const isDev = process.env.NODE_ENV === 'development'
+const isTest = process.env.NODE_ENV === 'test'
 
 const config: NuxtConfig = {
   srcDir: 'src',
@@ -12,7 +13,7 @@ const config: NuxtConfig = {
   ssr: false,
 
   // Modern (https://nuxtjs.org/docs/2.x/configuration-glossary/configuration-modern)
-  modern: isDev ? false : 'client',
+  modern: isDev || isTest ? false : 'client',
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -60,7 +61,7 @@ const config: NuxtConfig = {
 
   // Http module configuration (https://http.nuxtjs.org/options)
   http: {
-    proxy: isDev,
+    proxy: isDev || isTest,
   },
 
   // Proxy module configuration: https://github.com/nuxt-community/proxy-module#options

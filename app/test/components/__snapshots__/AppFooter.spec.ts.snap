@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AppFooter renders correctly 1`] = `
+"<footer class=\\"v-footer v-sheet theme--light v-footer--fixed\\" style=\\"left: 0px; right: 0px; bottom: 0px;\\">
+  <div class=\\"spacer\\"></div> <a href=\\"https://github.com/ChargedByte/WiM\\" target=\\"_blank\\" class=\\"v-btn v-btn--icon v-btn--round theme--light v-size--small\\"><span class=\\"v-btn__content\\"><i aria-hidden=\\"true\\" class=\\"v-icon notranslate mdi mdi-github theme--light\\"></i></span></a>
+</footer>"
+`;

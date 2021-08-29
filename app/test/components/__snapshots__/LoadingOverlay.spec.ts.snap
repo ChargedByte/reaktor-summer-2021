@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoadingOverlay renders correctly: off 1`] = `
+"<div class=\\"v-overlay theme--dark\\" style=\\"z-index: 5;\\">
+  <div class=\\"v-overlay__scrim\\" style=\\"opacity: 0; background-color: rgb(33, 33, 33); border-color: #212121;\\"></div>
+</div>"
+`;
+
+exports[`LoadingOverlay renders correctly: on 1`] = `
+"<div class=\\"v-overlay v-overlay--active theme--dark\\" style=\\"z-index: 5;\\">
+  <div class=\\"v-overlay__scrim\\" style=\\"opacity: 1; background-color: rgb(33, 33, 33); border-color: #212121;\\"></div>
+  <div class=\\"v-overlay__content\\">
+    <div role=\\"progressbar\\" aria-valuemin=\\"0\\" aria-valuemax=\\"100\\" class=\\"v-progress-circular v-progress-circular--visible v-progress-circular--indeterminate primary--text\\" style=\\"height: 64px; width: 64px;\\"><svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"21.333333333333332 21.333333333333332 42.666666666666664 42.666666666666664\\" style=\\"transform: rotate(0deg);\\">
+        <circle fill=\\"transparent\\" cx=\\"42.666666666666664\\" cy=\\"42.666666666666664\\" r=\\"20\\" stroke-width=\\"2.6666666666666665\\" stroke-dasharray=\\"125.664\\" stroke-dashoffset=\\"125.66370614359172px\\" class=\\"v-progress-circular__overlay\\"></circle>
+      </svg>
+      <div class=\\"v-progress-circular__info\\"></div>
+    </div>
+  </div>
+</div>"
+`;

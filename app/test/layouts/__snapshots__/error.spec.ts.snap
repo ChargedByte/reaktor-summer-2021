@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ErrorPage renders correctly: 404 1`] = `
+"<div class=\\"container container-error pa-0 container--fluid fill-height\\">
+  <div class=\\"row align-center justify-center\\">
+    <div class=\\"transparent v-card v-card--flat v-sheet theme--dark\\">
+      <div class=\\"row align-center justify-center\\"><span class=\\"text-status\\">404</span></div>
+      <div class=\\"row align-center justify-center\\"><span class=\\"text-message\\">Page Not Found</span></div>
+      <div class=\\"row mt-10 align-center justify-center\\"><a class=\\"v-btn v-btn--is-elevated v-btn--has-bg v-btn--router theme--dark v-size--default\\"><span class=\\"v-btn__content\\">Go Home</span></a></div>
+    </div>
+  </div>
+</div>"
+`;
+
+exports[`ErrorPage renders correctly: 500 1`] = `
+"<div class=\\"container container-error pa-0 container--fluid fill-height\\">
+  <div class=\\"row align-center justify-center\\">
+    <div class=\\"transparent v-card v-card--flat v-sheet theme--dark\\">
+      <div class=\\"row align-center justify-center\\"><span class=\\"text-status\\">500</span></div>
+      <div class=\\"row align-center justify-center\\"><span class=\\"text-message\\">An Error Occurred</span></div>
+      <div class=\\"row mt-10 align-center justify-center\\"><a class=\\"v-btn v-btn--is-elevated v-btn--has-bg v-btn--router theme--dark v-size--default\\"><span class=\\"v-btn__content\\">Go Home</span></a></div>
+    </div>
+  </div>
+</div>"
+`;

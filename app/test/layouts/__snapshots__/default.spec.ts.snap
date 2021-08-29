@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DefaultLayout renders correctly 1`] = `
+"<div data-app=\\"true\\" class=\\"v-application v-application--is-ltr theme--light\\" id=\\"wim\\">
+  <div class=\\"v-application--wrap\\">
+    <header class=\\"v-sheet theme--dark v-toolbar v-toolbar--dense v-app-bar v-app-bar--fixed primary\\" style=\\"height: 48px; margin-top: 0px; transform: translateY(0px); left: 0px; right: 0px;\\">
+      <div class=\\"v-toolbar__content\\" style=\\"height: 48px;\\">
+        <div class=\\"v-tabs v-tabs--centered theme--dark\\">
+          <div role=\\"tablist\\" class=\\"v-item-group theme--dark v-slide-group v-tabs-bar v-tabs-bar--is-mobile white--text\\">
+            <div class=\\"v-slide-group__prev v-slide-group__prev--disabled\\">
+              <transition-stub name=\\"fade-transition\\"></transition-stub>
+            </div>
+            <div class=\\"v-slide-group__wrapper\\">
+              <div class=\\"v-slide-group__content v-tabs-bar__content\\">
+                <div class=\\"v-tabs-slider-wrapper\\" style=\\"transition: none;\\">
+                  <div class=\\"v-tabs-slider\\"></div>
+                </div><a tabindex=\\"0\\" aria-selected=\\"true\\" role=\\"tab\\" class=\\"v-tab\\">
+                  beanies
+                </a><a tabindex=\\"0\\" aria-selected=\\"false\\" role=\\"tab\\" class=\\"v-tab\\">
+                  facemasks
+                </a><a tabindex=\\"0\\" aria-selected=\\"false\\" role=\\"tab\\" class=\\"v-tab\\">
+                  gloves
+                </a>
+              </div>
+            </div>
+            <div class=\\"v-slide-group__next v-slide-group__next--disabled\\">
+              <transition-stub name=\\"fade-transition\\"></transition-stub>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class=\\"v-main\\" style=\\"padding: 48px 0px 0px 0px;\\">
+      <div class=\\"v-main__wrap\\">
+        <div></div>
+      </div>
+    </main>
+    <footer class=\\"v-footer v-sheet theme--light v-footer--fixed\\" style=\\"left: 0px; right: 0px; bottom: 0px;\\">
+      <div class=\\"spacer\\"></div> <a href=\\"https://github.com/ChargedByte/WiM\\" target=\\"_blank\\" class=\\"v-btn v-btn--icon v-btn--round theme--light v-size--small\\"><span class=\\"v-btn__content\\"><i aria-hidden=\\"true\\" class=\\"v-icon notranslate mdi mdi-github theme--light\\"></i></span></a>
+    </footer>
+  </div>
+</div>"
+`;
