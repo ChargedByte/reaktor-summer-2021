@@ -248,10 +248,8 @@ public class ApplicationIntegrationTests {
 
         taskScheduler.schedule(productUpdateTask, Instant.now().plusMillis(1));
 
-        // Wait until products have been processed
-        while (productUpdateTask.isRunning().get()) {
-            Thread.sleep(1000);
-        }
+        // Wait until products should have been processed
+        Thread.sleep(2500);
 
         mvc.perform(get("/api/products/beanies").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
