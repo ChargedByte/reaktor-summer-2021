@@ -3,7 +3,7 @@
 My solution to Reaktor's Junior Developer, summer
 2021 [pre-assignment](https://web.archive.org/web/20201231124339/https://www.reaktor.com/junior-dev-assignment/)
 
-Live Demo: ~~https://peaceful-earth-81572.herokuapp.com/~~ No longer available.  
+Live Demo: https://shielded-hollows-01134.herokuapp.com/  
 Initial startup of the application can take a couple of minutes as it initially pulls data from the legacy APIs to the
 cache.
 
