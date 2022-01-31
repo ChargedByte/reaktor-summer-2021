@@ -5,7 +5,7 @@ My solution to Reaktor's Junior Developer, summer
 
 Live Demo: https://shielded-hollows-01134.herokuapp.com/  
 Initial startup of the application can take a couple of minutes as it initially pulls data from the legacy APIs to the
-cache.
+cache. I also noted that switching tabs (at least on Firefox) while the application is initally starting can break the timer and leave it loading indefinetly, in such case just reloading the page should fix this.
 
 WiM consists of two distinct parts, server and app.
 
